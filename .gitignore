@@ -1,0 +1,12 @@
+# Dependencias (son muy pesadas, se instalan con npm install)
+node_modules/
+
+# Variables de entorno (Aquí están tus secretos de DB)
+.env
+
+# Llaves Criptográficas (¡NUNCA SUBIR LLAVES PRIVADAS!)
+keys/
+
+# Logs y archivos del sistema
+.DS_Store
+npm-debug.log
