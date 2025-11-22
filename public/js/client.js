@@ -31,18 +31,26 @@ async function login() {
 
 let PROF_PRIVATE_PEM = '';
 
+// Simple toast utility
+function showToast(msg, ms = 2500) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), ms);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const loadBtn = document.getElementById('loadKeyBtn');
     const clearBtn = document.getElementById('clearKeyBtn');
     const fileIn = document.getElementById('profKeyFile');
     loadBtn.addEventListener('click', () => {
         const file = fileIn.files[0];
-        if (!file) return alert('Selecciona un archivo .pem antes.');
+        if (!file) return showToast('Selecciona un archivo .pem antes.');
         const reader = new FileReader();
         reader.onload = (e) => {
             PROF_PRIVATE_PEM = e.target.result;
             document.getElementById('profPrivateKey').value = PROF_PRIVATE_PEM;
-            alert('Llave cargada correctamente.');
+            showToast('Llave cargada correctamente');
             document.getElementById('submitBtn').disabled = false;
             document.getElementById('keyStatus').textContent = 'Llave cargada';
         };
@@ -53,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('profPrivateKey').value = '';
         document.getElementById('submitBtn').disabled = true;
         document.getElementById('keyStatus').textContent = 'Llave no cargada';
+        showToast('Llave eliminada');
     });
 });
 
@@ -62,7 +71,7 @@ async function submitSecure() {
     const comment = document.getElementById('comment').value;
     const profKeyPem = PROF_PRIVATE_PEM || document.getElementById('profPrivateKey').value;
 
-    if(!profKeyPem) return alert("Necesitas tu llave privada para firmar");
+    if(!profKeyPem) return showToast("Necesitas tu llave privada para firmar");
 
     // 1. OBTENER LLAVE PÚBLICA DEL SERVIDOR
     const keyRes = await fetch(`${API}/grades/public-key`);
@@ -105,9 +114,8 @@ async function submitSecure() {
             iv: forge.util.bytesToHex(iv)
         })
     });
-
     const result = await response.json();
-    alert(result.message || result.error);
+    showToast(result.message || result.error || 'Respuesta recibida');
     loadGrades();
 }
 

@@ -2,43 +2,82 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Sistema Escolar Seguro</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <link rel="stylesheet" href="/css/styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/1.3.1/forge.min.js"></script>
 </head>
 <body>
-    <h1>Sistema de Calificaciones</h1>
-
-    <div id="login-section">
-        <h2>Login</h2>
-        <input type="text" id="uUser" placeholder="Usuario">
-        <input type="password" id="uPass" placeholder="Contraseña">
-        <button onclick="login()">Entrar</button>
-        <button onclick="register()">Registrarse</button>
-    </div>
-
-    <div id="app-section" style="display:none;">
-        <h2>Subir Calificación (Modo Profesor)</h2>
-        <input type="text" id="student" placeholder="Nombre Alumno">
-        <input type="number" id="grade" placeholder="Calificación (0-100)">
-        <textarea id="comment" placeholder="Comentario Privado"></textarea>
-        
-        <h3>Simular Firma Digital</h3>
-        <div>
-            <label for="profKeyFile">Cargar `prof_private.pem` (archivo):</label>
-            <input type="file" id="profKeyFile" accept=".pem">
-            <button id="loadKeyBtn">Cargar llave</button>
-            <button id="clearKeyBtn">Borrar llave</button>
+    <div class="container">
+        <div class="header">
+            <div class="logo">SS</div>
+            <div>
+                <div class="title">Sistema Escolar Seguro</div>
+                <div class="subtitle">Envío cifrado y firma digital — demo</div>
+            </div>
         </div>
-        <textarea id="profPrivateKey" placeholder="Aquí aparecerá la llave privada cargada" rows="4" readonly></textarea>
 
-        <button id="submitBtn" onclick="submitSecure()" disabled>Enviar Blindado</button>
-        <div id="keyStatus" style="margin-top:8px;color:#555;">Llave no cargada</div>
-        <hr>
-        <h3>Base de Datos (Vista)</h3>
-        <button onclick="loadGrades()">Refrescar Lista</button>
-        <pre id="results"></pre>
+        <div class="grid">
+            <div class="card">
+                <div id="login-section">
+                    <h2>Acceso</h2>
+                    <div class="form-row">
+                        <label class="small">Usuario</label>
+                        <input type="text" id="uUser" placeholder="Usuario">
+                    </div>
+                    <div class="form-row">
+                        <label class="small">Contraseña</label>
+                        <input type="password" id="uPass" placeholder="Contraseña">
+                    </div>
+                    <div style="display:flex;gap:8px">
+                        <button class="btn" onclick="login()">Entrar</button>
+                        <button class="btn secondary" onclick="register()">Registrarse</button>
+                    </div>
+                </div>
+
+                <div id="app-section" style="display:none;margin-top:18px;">
+                    <h2>Subir Calificación (Profesor)</h2>
+                    <div class="form-row">
+                        <label class="small">Alumno</label>
+                        <input type="text" id="student" placeholder="Nombre Alumno">
+                    </div>
+                    <div class="form-row" style="max-width:180px">
+                        <label class="small">Calificación</label>
+                        <input type="number" id="grade" placeholder="0-100">
+                    </div>
+                    <div class="form-row">
+                        <label class="small">Comentario privado</label>
+                        <textarea id="comment" placeholder="Comentario Privado"></textarea>
+                    </div>
+
+                    <h3>Simular Firma Digital</h3>
+                    <div class="file-row">
+                        <input type="file" id="profKeyFile" accept=".pem">
+                        <button id="loadKeyBtn" class="btn secondary">Cargar llave</button>
+                        <button id="clearKeyBtn" class="btn secondary">Borrar llave</button>
+                    </div>
+                    <div class="form-row">
+                        <textarea id="profPrivateKey" placeholder="Aquí aparecerá la llave privada cargada" readonly></textarea>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <button id="submitBtn" class="btn" onclick="submitSecure()" disabled>Enviar Blindado</button>
+                        <div id="keyStatus" class="small">Llave no cargada</div>
+                    </div>
+                    <div class="footer">Consejo: Selecciona `prof_private.pem` y haz clic en `Cargar llave`.</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Base de Datos (Vista)</h2>
+                <div style="display:flex;gap:8px;margin-bottom:8px">
+                    <button class="btn" onclick="loadGrades()">Refrescar Lista</button>
+                </div>
+                <pre id="results">[]</pre>
+            </div>
+        </div>
     </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script src="js/client.js"></script>
 </body>
