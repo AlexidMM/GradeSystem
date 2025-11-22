@@ -5,12 +5,21 @@ exports.submitGrade = async (req, res) => {
     try {
         // Recibe el "Sobre Digital" del Frontend
         const decryptedData = cryptoService.hybridDecrypt(req.body);
+        console.log('--- Sobre digital descifrado ---');
+        console.log('Decrypted data keys:', Object.keys(decryptedData));
+        console.log('Student:', decryptedData.student);
+        console.log('Grade:', decryptedData.grade);
+        console.log('Signature type:', typeof decryptedData.signature);
+        if (decryptedData.signature) console.log('Signature len:', decryptedData.signature.length, 'prefix:', decryptedData.signature.slice(0,40));
         
         // Requisito 3: Verificar Firma
         const stringToVerify = `${decryptedData.student}-${decryptedData.grade}`;
         const isSigned = cryptoService.verifySignature(stringToVerify, decryptedData.signature);
         
-        if (!isSigned) return res.status(403).json({ error: 'FIRMA FALSA DETECTADA' });
+        if (!isSigned) {
+            console.warn('Firma inválida para:', decryptedData.student, decryptedData.grade);
+            return res.status(403).json({ error: 'FIRMA FALSA DETECTADA' });
+        }
 
         // Requisito 2: Cifrar para la BD (AES)
         const secureComment = cryptoService.encryptData(decryptedData.comment);

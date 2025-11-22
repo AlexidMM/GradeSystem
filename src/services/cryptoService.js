@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
+const forge = require('node-forge');
 const path = require('path');
 
 // Cargar llaves
@@ -33,12 +34,33 @@ const cryptoService = {
         return decrypted;
     },
 
-    // 3. VALIDAR FIRMA (RSA)
+    // 3. VALIDAR FIRMA (RSA) - usar node-forge para ser consistente con el frontend
     verifySignature: (dataString, signatureHex) => {
-        const verify = crypto.createVerify('SHA256');
-        verify.update(dataString);
-        verify.end();
-        return verify.verify(PROF_PUBLIC_KEY, signatureHex, 'hex');
+        try {
+            const pub = forge.pki.publicKeyFromPem(PROF_PUBLIC_KEY);
+            const md = forge.md.sha256.create();
+            md.update(dataString, 'utf8');
+            const sigBytes = forge.util.hexToBytes(signatureHex);
+            const ok = pub.verify(md.digest().bytes(), sigBytes);
+            if (ok) return true;
+            // Fallback: try Node's crypto verify which may accept a different padding/format
+            try {
+                const verify = crypto.createVerify('SHA256');
+                verify.update(dataString);
+                verify.end();
+                const ok2 = verify.verify(PROF_PUBLIC_KEY, signatureHex, 'hex');
+                if (ok2) {
+                    console.warn('verifySignature: verification succeeded with Node crypto fallback');
+                    return true;
+                }
+            } catch (err2) {
+                console.warn('verifySignature: Node crypto fallback error', err2.message);
+            }
+            return false;
+        } catch (err) {
+            console.error('Error verificando firma:', err);
+            return false;
+        }
     },
 
     // 4. DESCIFRADO HÍBRIDO (Abrir el sobre del Frontend)

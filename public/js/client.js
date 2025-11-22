@@ -29,11 +29,38 @@ async function login() {
 
 // --- LÓGICA CRIPTOGRÁFICA (LO IMPORTANTE) ---
 
+let PROF_PRIVATE_PEM = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const loadBtn = document.getElementById('loadKeyBtn');
+    const clearBtn = document.getElementById('clearKeyBtn');
+    const fileIn = document.getElementById('profKeyFile');
+    loadBtn.addEventListener('click', () => {
+        const file = fileIn.files[0];
+        if (!file) return alert('Selecciona un archivo .pem antes.');
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            PROF_PRIVATE_PEM = e.target.result;
+            document.getElementById('profPrivateKey').value = PROF_PRIVATE_PEM;
+            alert('Llave cargada correctamente.');
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('keyStatus').textContent = 'Llave cargada';
+        };
+        reader.readAsText(file);
+    });
+    clearBtn.addEventListener('click', () => {
+        PROF_PRIVATE_PEM = '';
+        document.getElementById('profPrivateKey').value = '';
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('keyStatus').textContent = 'Llave no cargada';
+    });
+});
+
 async function submitSecure() {
     const student = document.getElementById('student').value;
     const grade = document.getElementById('grade').value;
     const comment = document.getElementById('comment').value;
-    const profKeyPem = document.getElementById('profPrivateKey').value;
+    const profKeyPem = PROF_PRIVATE_PEM || document.getElementById('profPrivateKey').value;
 
     if(!profKeyPem) return alert("Necesitas tu llave privada para firmar");
 
@@ -45,7 +72,8 @@ async function submitSecure() {
     const md = forge.md.sha256.create();
     md.update(`${student}-${grade}`, 'utf8');
     const privateKey = forge.pki.privateKeyFromPem(profKeyPem);
-    const signature = forge.util.bytesToHex(privateKey.sign(md));
+    const signatureBytes = privateKey.sign(md);
+    const signature = forge.util.bytesToHex(signatureBytes);
 
     // Objeto a enviar
     const payload = JSON.stringify({ student, grade, comment, signature });

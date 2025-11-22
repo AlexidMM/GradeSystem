@@ -24,9 +24,16 @@
         <textarea id="comment" placeholder="Comentario Privado"></textarea>
         
         <h3>Simular Firma Digital</h3>
-        <textarea id="profPrivateKey" placeholder="Pega aquí el contenido de keys/prof_private.pem para firmar" rows="3"></textarea>
-        
-        <button onclick="submitSecure()">Enviar Blindado</button>
+        <div>
+            <label for="profKeyFile">Cargar `prof_private.pem` (archivo):</label>
+            <input type="file" id="profKeyFile" accept=".pem">
+            <button id="loadKeyBtn">Cargar llave</button>
+            <button id="clearKeyBtn">Borrar llave</button>
+        </div>
+        <textarea id="profPrivateKey" placeholder="Aquí aparecerá la llave privada cargada" rows="4" readonly></textarea>
+
+        <button id="submitBtn" onclick="submitSecure()" disabled>Enviar Blindado</button>
+        <div id="keyStatus" style="margin-top:8px;color:#555;">Llave no cargada</div>
         <hr>
         <h3>Base de Datos (Vista)</h3>
         <button onclick="loadGrades()">Refrescar Lista</button>
